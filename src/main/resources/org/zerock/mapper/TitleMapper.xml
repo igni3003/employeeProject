@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="org.zerock.mapper.TitleMapper">
+  	<insert id="insert">
+  		<![CDATA[
+		insert into titles
+		(emp_no, title, from_date, to_date) 
+		values (#{emp_no},#{title},#{from_date},'9999-01-01')
+		]]>
+  	</insert>
+  	
+  	<select id="getTitles" resultType="org.zerock.domain.vo.title.TitleVO">
+  		select * 
+		from titles 
+		where emp_no = #{emp_no}
+		order by from_date desc
+  	</select>
+
+	<update id="retire">
+		UPDATE dept_manager
+		SET to_date = curdate()
+		WHERE emp_no = #{emp_no}
+	</update>
+  	
+  </mapper>

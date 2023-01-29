@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zerock.mapper.EmployeeMapper">
+	<sql id="criteria">
+		<trim prefix="AND">
+			<choose>
+				<when test="type == 'E'.toString()">
+					emp_no like CONCAT('%', #{keyword}, '%')
+				</when>
+				<when test="type == 'N'.toString()">
+					last_name like CONCAT('%', #{keyword}, '%')
+				</when>
+			</choose>
+		</trim>
+	</sql>
+
+	<select id="getListWithPaging"
+		resultType="org.zerock.domain.EmployeeVO">
+		<![CDATA[
+			select * from employees 
+			where emp_no > 0 
+		]]>
+
+		<include refid="criteria" />
+
+		order by emp_no desc
+		limit #{pageStart}, #{amount}
+
+	</select>
+
+	<select id="getTotalCount" resultType="int">
+		<![CDATA[
+			select count(*) 
+			from employees
+			where emp_no > 0
+		]]>
+		<include refid="criteria" />
+	</select>
+
+
+	<insert id="insertSelectKey">
+		<selectKey order="BEFORE" keyProperty="emp_no" resultType="long">
+			<![CDATA[
+				select MAX(emp_no)+1 from employees
+			]]>
+		</selectKey>
+			<![CDATA[
+				insert into employees
+				(emp_no, birth_date, first_name, last_name, gender, hire_date) 
+				values (#{emp_no},#{birth_name},#{first_name},#{last_name}, #{gender},#{hire_date})
+			]]>
+	</insert>
+
+</mapper>

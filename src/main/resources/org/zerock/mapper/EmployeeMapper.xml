@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zerock.mapper.EmployeeMapper">
+	<sql id="criteria">
+		<trim prefix="AND">
+			<choose>
+				<when test="type == 'E'.toString()">
+					e.emp_no like CONCAT('%', #{keyword}, '%')
+				</when>
+				<when test="type == 'N'.toString()">
+					e.last_name like CONCAT('%', #{keyword}, '%')
+				</when>
+				<when test="type == 'D'.toString()">
+					d.dept_name like CONCAT('%', #{keyword}, '%')
+				</when>
+				<when test="type == 'T'.toString()">
+					e.title like CONCAT('%', #{keyword}, '%')
+				</when>
+			</choose>
+		</trim>
+	</sql>
+
+	<select id="getListWithPaging"
+		resultType="org.zerock.domain.vo.employee.EmployeeVO">
+		<![CDATA[
+			select e.*, d.dept_name 
+			from employees e 
+			join departments d on e.dept_no = d.dept_no 
+			where e.emp_no > 0 
+		]]>
+
+		<include refid="criteria" />
+
+		order by e.emp_no desc
+		limit #{pageStart}, #{amount}
+
+	</select>
+
+	<select id="getTotalCount" resultType="int">
+		<![CDATA[
+			select count(*) 
+			from employees e
+			join departments d on e.dept_no = d.dept_no
+			where e.emp_no > 0
+		]]>
+		<include refid="criteria" />
+	</select>
+
+
+	<insert id="insertSelectKey">
+		<selectKey order="BEFORE" keyProperty="emp_no" resultType="long">
+			<![CDATA[
+				select MAX(emp_no)+1 from employees
+			]]>
+		</selectKey>
+			<![CDATA[
+				insert into employees
+				(emp_no, dept_no, title, birth_date, first_name, last_name, gender, hire_date) 
+				values (#{emp_no},#{dept_no},#{title},#{birth_date},#{first_name},#{last_name}, #{gender},#{hire_date})
+			]]>
+	</insert>
+	
+	<select id="read" resultType="org.zerock.domain.vo.employee.EmployeeVO">
+		select * 
+		from employees e 
+		join departments d on e.dept_no = d.dept_no
+		where e.emp_no = #{emp_no}
+	</select>
+
+
+	<update id="update">
+		update employees 
+		set dept_no =#{dept_no},
+			title=#{title},
+			gender=#{gender},
+			first_name= #{first_name},
+			last_name= #{last_name},
+			birth_date= #{birth_date}		
+		where emp_no = #{emp_no}
+	</update>
+
+	<update id="retire">
+		UPDATE employees
+		SET retire_date = curdate()
+		WHERE emp_no = #{emp_no}
+	</update>
+</mapper>
+
+

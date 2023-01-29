@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zerock.mapper.BoardAttachMapper">
+
+    <resultMap type="org.zerock.domain.vo.board.BoardAttachVO" id="mapping_attachlist">
+        <result property="uuid" column="uuid"/>
+        <result property="uploadPath" column="upload_path"/>
+        <result property="fileName" column="file_name"/>
+        <result property="fileType" column="file_type"/>
+        <result property="b_no" column="b_no"/>
+    </resultMap>
+
+    <insert id="insert">
+        insert into employees.attach (uuid, upload_path, file_name, file_type, b_no)
+        values (#{uuid}, #{uploadPath}, #{fileName}, #{fileType}, #{b_no})
+    </insert>
+
+    <delete id="delete">
+        delete from employees.attach where uuid=#{uuid}
+    </delete>
+
+    <delete id="deleteAll">
+        delete from employees.attach where b_no=#{b_no}
+    </delete>
+
+    <select id="findByBno" resultMap="mapping_attachlist">
+        select * from employees.attach where b_no=#{b_no}
+    </select>
+
+</mapper>

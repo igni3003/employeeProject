@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zerock.mapper.ReplyMapper">
+	
+	<select id="getListWithPaging" resultType="org.zerock.domain.vo.common.ReplyVO">
+		SELECT * FROM employees.reply
+		where b_no = #{b_no} and r_no > 0 
+		order by r_no asc
+		limit #{cri.pageStart}, #{cri.amount}
+	</select>
+	
+	<select id="getCountByBno" resultType="int">
+		SELECT count(r_no) 
+		FROM employees.reply 
+		WHERE b_no = #{b_no}
+	</select>
+	
+	<update id="update">
+		UPDATE employees.reply 
+		SET reply = #{reply},update_date=now() 
+		WHERE r_no=#{r_no}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM employees.reply
+		WHERE r_no = #{r_no}
+	</delete>
+	
+	<delete id="deleteAll">
+		delete from employees.reply where b_no=#{b_no}
+	</delete>
+	
+	<select id="read" resultType="org.zerock.domain.vo.common.ReplyVO">
+		SELECT * FROM employees.reply
+		WHERE r_no = #{r_no}
+	</select>
+	
+	<insert id="insert" keyProperty="r_no" useGeneratedKeys="true">
+		INSERT INTO employees.reply (b_no, reply, emp_no)
+		VALUES (#{b_no}, #{reply}, #{emp_no})
+	</insert>
+	
+	
+</mapper>

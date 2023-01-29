@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zerock.mapper.BoardMapper">
+
+	<sql id="criteria">
+		<trim prefix="AND (" suffix=")" prefixOverrides="OR">
+			<foreach item="type" collection="typeArr">
+				<trim prefix="OR">
+					<choose>
+						<when test="type == 'T'.toString()">
+							title like CONCAT('%', #{keyword}, '%')
+						</when>
+						<when test="type == 'C'.toString()">
+							emp_no like CONCAT('%', #{keyword}, '%')
+						</when>
+					</choose>
+				</trim>
+			</foreach>
+		</trim>
+	</sql>
+
+	<select id="getTotalCount" resultType="int">
+		<![CDATA[
+			SELECT count(*) 
+			FROM employees.board
+			WHERE b_no > 0 
+		]]>
+
+		<include refid="criteria" />
+
+	</select>
+
+	<select id="getListWithPaging"
+		resultType="org.zerock.domain.vo.board.BoardVO">
+		<![CDATA[
+			SELECT * 
+			FROM employees.board
+			WHERE b_no > 0
+		]]>
+
+		<include refid="criteria" />
+
+		ORDER BY b_no DESC
+		LIMIT #{pageStart}, #{amount}
+
+	</select>
+
+	<select id="getList" resultType="org.zerock.domain.vo.board.BoardVO">
+		
+		<![CDATA[
+		SELECT * FROM employees.board where b_no > 0
+		]]>
+	</select>
+
+	<select id="read" resultType="org.zerock.domain.vo.board.BoardVO">
+		<![CDATA[
+			SELECT * 
+			FROM employees.board 
+		]]>
+		<where>
+			<if test="b_no != null">
+				b_no = #{b_no}
+			</if>
+		</where>
+	</select>
+
+	<insert id="insert" keyProperty="b_no" useGeneratedKeys="true">
+		
+		<![CDATA[
+		insert into employees.board(emp_no ,title, content) values (#{emp_no},#{title},#{content})
+		]]>
+	</insert>
+
+	<insert id="insertSelectKey">
+
+		<selectKey order="BEFORE" keyProperty="b_no"
+			resultType="Long">
+			<![CDATA[
+			select MAX(b_no)+1 from employees.board
+			]]>
+		</selectKey>
+		<![CDATA[
+		insert into employees.board(b_no, emp_no, title, content) values (#{b_no},#{emp_no},#{title},#{content})
+		]]>
+	</insert>
+
+	<delete id="delete">
+		<![CDATA[
+		delete from employees.board where b_no=#{b_no}
+		]]>
+	</delete>
+
+	<update id="update">
+		<![CDATA[
+		update employees.board set title =#{title},content=#{content},update_date=now() where b_no=#{b_no}
+		]]>
+	</update>
+	
+	<update id="updateReplyCnt">
+		UPDATE employees.board
+		SET replycnt = replycnt+#{amount}
+		WHERE b_no = #{b_no}
+	</update>
+	
+</mapper>

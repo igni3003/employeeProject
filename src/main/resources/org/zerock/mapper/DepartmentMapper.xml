@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zerock.mapper.DepartmentMapper">
+	<select id="getDeptTitles" resultType="org.zerock.domain.vo.depart.DeptTitleVO">
+		SELECT * FROM dept_title 
+		WHERE dept_no = #{dept_no}
+	</select>
+	
+	<insert id="insertDeptEmployee">
+			<![CDATA[
+				insert into dept_emp
+				(emp_no, dept_no, from_date, to_date) 
+				values (#{emp_no},#{dept_no},#{from_date},'9999-01-01')
+			]]>
+	</insert>
+	
+	<select id="getDeptEmployee" resultType="org.zerock.domain.vo.depart.DeptEmpVO">
+		select de.*, d.dept_name from dept_emp de
+		join departments d on de.dept_no = d.dept_no
+		where de.emp_no = #{emp_no}
+		order by de.from_date desc
+	</select>
+	
+	
+	<select id="eqCurrentDept" resultType="int">
+		select count(*) from (
+			select dept_no as dept_no 
+			from dept_emp 
+			where emp_no = #{emp_no} 
+			order by from_date desc 
+			limit 1
+		) as dept_emp 
+		where dept_no = #{dept_no}
+	</select>
+
+	<update id="retire">
+		UPDATE dept_emp
+		SET to_date = curdate()
+		WHERE emp_no = #{emp_no}
+	</update>
+	
+	
+	
+</mapper>
